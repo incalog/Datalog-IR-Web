@@ -49,7 +49,7 @@ export class App {
     Souffle: '/resources/souffle_sample.dl'
   };
   private readonly sampleQueries: Record<IncaDialect, string> = {
-    Datalog: 'SPath(1, 4, ?)',
+    Datalog: 'path(1, ?)',
     FunctionalInca: 'main(5)',
     OODL: 'main(5)',
     Souffle: 'path(1, ?)'
