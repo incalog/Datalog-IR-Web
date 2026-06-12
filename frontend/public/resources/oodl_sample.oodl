@@ -1,0 +1,16 @@
+module Fact
+
+class Factorial {
+  def calc(n: Int): Int = {
+    if (n == 1)
+      return 1
+    else
+      return n * this.calc(n - 1)
+  }
+}
+
+@main
+def main(n: Int): Int = {
+  val f = new Factorial()
+  return f.calc(n)
+}

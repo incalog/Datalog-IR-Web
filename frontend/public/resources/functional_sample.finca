@@ -1,0 +1,10 @@
+module Fact
+
+def fact(n: Int): Int =
+  if (n <= 1)
+    1
+  else
+    n * fact(n - 1)
+
+@main def main(n: Int): Int =
+  fact(n)

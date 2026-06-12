@@ -1,0 +1,137 @@
+<main class="page-shell">
+  <section class="intro-panel">
+    <p class="eyebrow">INCA runner</p>
+    <h1>Execute Datalog programs from the browser.</h1>
+    <p class="intro-copy">
+      Select a dialect and backend, write a program, define a query and run it.
+    </p>
+  </section>
+
+  <section class="workspace" aria-label="Program execution form">
+    <form class="runner-form" (ngSubmit)="runProgram()">
+      <div class="controls-grid">
+        <label>
+          <span>Dialect</span>
+          <select name="dialect" [ngModel]="dialect()" (change)="onDialectSelect($event)">
+            @for (option of dialects; track option) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          <span>Backend</span>
+          <select name="backend" [ngModel]="backend()" (ngModelChange)="backend.set($event)">
+            @for (option of backends; track option) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <label class="code-field">
+        <span>Program</span>
+        <textarea
+          name="code"
+          [ngModel]="code()" (ngModelChange)="code.set($event)"
+          spellcheck="false"
+          placeholder="Enter the program to execute"
+        ></textarea>
+      </label>
+
+      <label>
+        <span>Query</span>
+        <input
+          name="queryText"
+          [ngModel]="queryText()" (ngModelChange)="queryText.set($event)"
+          type="text"
+          placeholder='R(?, 4) or main(1, "A")'
+        />
+      </label>
+
+      <div class="query-preview" [class.is-open]="showParsedQuery()">
+        <button class="preview-toggle" type="button" (click)="toggleParsedQuery()" [attr.aria-expanded]="showParsedQuery()">
+          <span>Parsed query</span>
+          <span aria-hidden="true">{{ showParsedQuery() ? 'Hide' : 'Show' }}</span>
+        </button>
+
+        @if (showParsedQuery()) {
+          <div class="preview-body">
+            @if (previewQuery(); as query) {
+              <code>{{ query | json }}</code>
+            } @else {
+              <code>Invalid query syntax</code>
+            }
+          </div>
+        }
+      </div>
+
+      <button type="submit" [disabled]="isRunning()">
+        {{ isRunning() ? 'Running...' : 'Run program' }}
+      </button>
+    </form>
+
+    <aside class="result-panel" aria-live="polite">
+      <h2>Result</h2>
+
+      @if (isRunning()) {
+        <div class="execution-progress" role="status" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <div>
+            <strong>Executing program</strong>
+            <p>The selected engine is running your query.</p>
+          </div>
+        </div>
+      } @else if (error(); as currentError) {
+        <pre class="error-output">{{ currentError }}</pre>
+      } @else if (result(); as currentResult) {
+        <div class="result-summary">
+          <div>
+            <span>Relation</span>
+            <strong>{{ currentResult.relation }}</strong>
+          </div>
+          <div>
+            <span>Rows</span>
+            <strong>{{ currentResult.size }}</strong>
+          </div>
+          <div>
+            <span>Arity</span>
+            <strong>{{ currentResult.arity }}</strong>
+          </div>
+        </div>
+
+        @if (currentResult.rows.length > 0) {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  @for (column of currentResult.columns; track column; let index = $index) {
+                    <th>{{ column || 'col_' + index }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of currentResult.rows; track $index) {
+                  <tr>
+                    @for (cell of row; track $index) {
+                      <td>{{ formatCell(cell) }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="empty-result">No matches returned.</p>
+        }
+
+        <details class="raw-result">
+          <summary>Raw result</summary>
+          <pre>{{ currentResult | json }}</pre>
+        </details>
+      } @else {
+        <p>Results from <code>/api/inca/execute</code> will appear here.</p>
+      }
+    </aside>
+  </section>
+</main>

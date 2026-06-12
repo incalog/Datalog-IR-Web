@@ -1,0 +1,11 @@
+Edge(Int, Int, Int).
+Edge(1, 4, 20).
+Edge(1, 2, 4).
+Edge(2, 3, 5).
+Edge(3, 4, 2).
+Edge(2, 4, 3).
+
+// Will not work in Ascent.
+SPath(Int, Int, Int).
+SPath(X,Y,min(n)) :- Edge(X, Y, n)
+                     :- Edge(X, Z, n1), SPath(Z, Y, n2), n == n1 + n2.
