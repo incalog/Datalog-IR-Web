@@ -1,0 +1,8 @@
+services:
+  inca-web:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
